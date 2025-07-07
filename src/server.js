@@ -15,7 +15,9 @@ export default function setupServer() {
           target: 'pino-pretty',
         },
       }),
-    );
+  );
+  
+  app.use(express.json());
     
   const PORT = getEnvVariable('PORT') || 3000;
       
