@@ -1,11 +1,11 @@
 import { ContactCollection } from '../db/Contact.js';
 
-export function getAllContacts(page, perPage, sortBy, sortOrder) {
+export async function getAllContacts(page, perPage, sortBy, sortOrder) {
 
   const skip = page > 0 ? (page - 1) * perPage : 0;
 
-  const contacts = ContactCollection.find().sort({ [sortBy]: sortOrder }).skip(skip).limit(perPage);
-  const total = ContactCollection.countDocuments();
+  const contacts = await ContactCollection.find().sort({ [sortBy]: sortOrder }).skip(skip).limit(perPage);
+  const total = await ContactCollection.countDocuments();
   const totalPages = Math.ceil(total / perPage);
 
   return {

@@ -1,13 +1,15 @@
 function parseNumber(value, defaultValue) {
     if (typeof value === 'undefined') {
         return defaultValue;
-    };
+    }
 
     const parsedValue = parseInt(value);
 
     if (Number.isNaN(parsedValue) === true) {
-        return defaultValue;; 
+        return defaultValue;
     }
+
+    return parsedValue;
 };
 
 export function parsePagintionsParams(query) {
