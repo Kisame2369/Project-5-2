@@ -1,7 +1,23 @@
 import { ContactCollection } from '../db/Contact.js';
 
-export function getAllContacts(){
-  return ContactCollection.find();
+export function getAllContacts(page, perPage, sortBy, sortOrder) {
+
+  const skip = page > 0 ? (page - 1) * perPage : 0;
+
+  const contacts = ContactCollection.find().sort({ [sortBy]: sortOrder }).skip(skip).limit(perPage);
+  const total = ContactCollection.countDocuments();
+  const totalPages = Math.ceil(total / perPage);
+
+  return {
+    contacts,
+    total,
+    page,
+    perPage,
+    totalPages,
+    hasNextPage: totalPages > page,
+    hasPreviousPage: page > 1,
+  };
+  
 };
 
 export function getContactById(id) {
