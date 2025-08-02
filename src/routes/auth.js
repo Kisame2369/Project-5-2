@@ -11,5 +11,5 @@ const router = express.Router();
 router.post("/register", validateBody(authSchema), ctrlWrapper(authController));
 router.post("/login", validateBody(loginSchema), ctrlWrapper(loginController));
 router.post("/logout", ctrlWrapper(logoutController));
-router.post("refresh", ctrlWrapper(refreshController));
+router.post("/refresh", ctrlWrapper(refreshController));
 export default router; 
