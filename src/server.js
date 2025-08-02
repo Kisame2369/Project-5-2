@@ -5,6 +5,7 @@ import { getEnvVariable } from './utils/getEnvVariable.js';
 import contactRoutes from './routes/routes.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import authRoutes from './routes/auth.js';
 
 export default function setupServer() {
 
@@ -33,7 +34,8 @@ export default function setupServer() {
         console.log(`Server is running on port ${PORT}`);
     });
 
-    app.use('/contacts', contactRoutes);
+  app.use('/contacts', contactRoutes);
+  app.use('/auth', authRoutes);
 
     app.use(notFoundHandler);
     app.use(errorHandler); 
