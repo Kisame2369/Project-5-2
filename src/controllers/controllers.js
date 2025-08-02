@@ -11,7 +11,7 @@ export async function getAllContactsController(req, res) {
 
   const { sortBy, sortOrder } = parseSortParams(req.query);
 
-  const contacts = await getAllContacts(page, perPage, sortBy, sortOrder);
+  const contacts = await getAllContacts(page, perPage, sortBy, sortOrder, req.user.id);
 
   res.json({
     status: 200,
@@ -23,22 +23,23 @@ export async function getAllContactsController(req, res) {
  
 export async function getContactByIdController(req, res) {
     
-    const contact = await getContactById(req.params.id);
+  const contact = await getContactById(req.params.id, req.user.id);
 
     if (contact === null) {
         throw new createHttpError.NotFound('Contact not found');
-    }
+  };
+   
     
-    res.json({
-      status: 200,
-      message: `Successfully found contact!`,
-      data: contact,
-    });
+  res.json({
+    status: 200,
+    message: `Successfully found contact!`,
+    data: contact,
+  });
 };
 
 export async function createContactController(req, res) {
 
-    const contact = await createContact(req.body);
+  const contact = await createContact({ ...req.body, userId: req.user.id });
 
     res.status(201).json({
       status: 201,

@@ -2,6 +2,7 @@ import { UserCollection } from "../db/user.js";
 import { SessionCollection } from "../db/session.js";
 import createHttpError from "http-errors";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 
 export async function registerUser(payload) {
     const user = await UserCollection.findOne({ email: payload.email });
@@ -15,6 +16,15 @@ export async function registerUser(payload) {
     return UserCollection.create(payload);
 };
 
+const accessToken = crypto.randomBytes(32).toString("base64");
+const refreshToken = crypto.randomBytes(32).toString("base64");
+
+const ACCESS_TOKEN_LIFETIME = 10 * 60 * 1000;
+const REFRESH_TOKEN_LIFETIME = 24 * 60 * 60 * 1000; 
+
+const accessTokenValidUntil = new Date(Date.now() + ACCESS_TOKEN_LIFETIME);
+const refreshTokenValidUntil = new Date(Date.now() + REFRESH_TOKEN_LIFETIME);
+
 export async function loginUser(email, password) {
     const user = await UserCollection.findOne({ email });
     
@@ -27,13 +37,54 @@ export async function loginUser(email, password) {
         throw new createHttpError.Unauthorized('Email or password is incorrect');
     }
 
+    
+
     await SessionCollection.deleteOne({ userId: user._id });
 
     return SessionCollection.create({
         userId: user._id,
-        accessToken: "AccessToken", 
-        refreshToken: "RefreshToken",
-        accessTokenValidUntil: new Date(Date.now() + 10 * 60 * 1000),
-        refreshTokenValidUntil: new Date(Date.now() + 24 * 60 * 60 * 1000), 
+        accessToken,
+        refreshToken,
+        accessTokenValidUntil,
+        refreshTokenValidUntil,
     });
+
+};
+
+export async function logoutUser(sessionId) {
+    const session = await SessionCollection.findById(sessionId);
+    
+    if (session === null) {
+        throw new createHttpError.Unauthorized('Session not found');
+    }
+
+    await SessionCollection.deleteOne({ _id: sessionId });
+};
+
+export async function refreshUserSession(sessionId, refreshToken) { 
+
+    const session = SessionCollection.findById(sessionId);
+
+    if (session === null) {
+        throw new createHttpError.Unauthorized('Session not found');
+    }
+
+    if (session.refreshToken !== refreshToken) {
+        throw new createHttpError.Unauthorized('Invalid refresh token');
+    }
+
+    if (session.refreshTokenValidUntil < new Date()) {
+        throw new createHttpError.Unauthorized('Refresh token expired');
+    }
+
+    await SessionCollection.deleteOne({ _id: session._id });
+
+    return SessionCollection.create({
+        userId: session.userId,
+        accessToken,
+        refreshToken,
+        accessTokenValidUntil,
+        refreshTokenValidUntil,
+    });
+
 };

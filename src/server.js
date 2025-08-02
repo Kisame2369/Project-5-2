@@ -6,6 +6,8 @@ import contactRoutes from './routes/routes.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import authRoutes from './routes/auth.js';
+import cookieParser from 'cookie-parser';
+import { auth } from './middlewares/auth.js';
 
 export default function setupServer() {
 
@@ -21,6 +23,8 @@ export default function setupServer() {
       }),
   );
   
+  app.use(cookieParser());
+
   app.use(express.json());
     
   const PORT = getEnvVariable('PORT') || 3000;
@@ -34,7 +38,7 @@ export default function setupServer() {
         console.log(`Server is running on port ${PORT}`);
     });
 
-  app.use('/contacts', contactRoutes);
+  app.use('/contacts', auth, contactRoutes);
   app.use('/auth', authRoutes);
 
     app.use(notFoundHandler);
