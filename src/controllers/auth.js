@@ -12,5 +12,14 @@ export async function authController(req, res) {
 
 export async function loginController(req, res) {
     const session = await loginUser(req.body.email, req.body.password);
-    console .log(session);
-}
+    console.log(session);
+
+    res.status(200).json({
+        status: 200,
+        message: 'Successfully logged in!',
+        data: {
+            accessToken: session.accessToken,
+            refreshToken: session.refreshToken,
+        },
+    });
+};
