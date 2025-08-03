@@ -4,6 +4,9 @@ import createHttpError from "http-errors";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 
+const ACCESS_TOKEN_LIFETIME = 10 * 60 * 1000;
+const REFRESH_TOKEN_LIFETIME = 24 * 60 * 60 * 1000; 
+
 export async function registerUser(payload) {
     const user = await UserCollection.findOne({ email: payload.email });
 
@@ -14,16 +17,7 @@ export async function registerUser(payload) {
     payload.password = await bcrypt.hash(payload.password, 10);
 
     return UserCollection.create(payload);
-};
-
-const accessToken = crypto.randomBytes(32).toString("base64");
-const refreshToken = crypto.randomBytes(32).toString("base64");
-
-const ACCESS_TOKEN_LIFETIME = 10 * 60 * 1000;
-const REFRESH_TOKEN_LIFETIME = 24 * 60 * 60 * 1000; 
-
-const accessTokenValidUntil = new Date(Date.now() + ACCESS_TOKEN_LIFETIME);
-const refreshTokenValidUntil = new Date(Date.now() + REFRESH_TOKEN_LIFETIME);
+}
 
 export async function loginUser(email, password) {
     const user = await UserCollection.findOne({ email });
@@ -37,7 +31,11 @@ export async function loginUser(email, password) {
         throw new createHttpError.Unauthorized('Email or password is incorrect');
     }
 
+    const accessToken = crypto.randomBytes(32).toString("base64");
+    const refreshToken = crypto.randomBytes(32).toString("base64");
     
+    const accessTokenValidUntil = new Date(Date.now() + ACCESS_TOKEN_LIFETIME);
+    const refreshTokenValidUntil = new Date(Date.now() + REFRESH_TOKEN_LIFETIME);
 
     await SessionCollection.deleteOne({ userId: user._id });
 
@@ -48,8 +46,7 @@ export async function loginUser(email, password) {
         accessTokenValidUntil,
         refreshTokenValidUntil,
     });
-
-};
+}
 
 export async function logoutUser(sessionId) {
     const session = await SessionCollection.findById(sessionId);
@@ -59,11 +56,10 @@ export async function logoutUser(sessionId) {
     }
 
     await SessionCollection.deleteOne({ _id: sessionId });
-};
+}
 
 export async function refreshUserSession(sessionId, refreshToken) { 
-
-    const session = SessionCollection.findById(sessionId);
+    const session = await SessionCollection.findById(sessionId);
 
     if (session === null) {
         throw new createHttpError.Unauthorized('Session not found');
@@ -77,14 +73,19 @@ export async function refreshUserSession(sessionId, refreshToken) {
         throw new createHttpError.Unauthorized('Refresh token expired');
     }
 
+    const newAccessToken = crypto.randomBytes(32).toString("base64");
+    const newRefreshToken = crypto.randomBytes(32).toString("base64");
+    
+    const accessTokenValidUntil = new Date(Date.now() + ACCESS_TOKEN_LIFETIME);
+    const refreshTokenValidUntil = new Date(Date.now() + REFRESH_TOKEN_LIFETIME);
+
     await SessionCollection.deleteOne({ _id: session._id });
 
     return SessionCollection.create({
         userId: session.userId,
-        accessToken,
-        refreshToken,
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
         accessTokenValidUntil,
         refreshTokenValidUntil,
     });
-
-};
+}
