@@ -50,7 +50,7 @@ export async function createContactController(req, res) {
 
 export async function deleteContactController(req, res) {
 
-    const contact = await deleteContact(req.params.id);
+    const contact = await deleteContact(req.params.id, req.user.id);
 
     if (contact === null) {
       throw new createHttpError.NotFound('Contact not found');
@@ -61,7 +61,7 @@ export async function deleteContactController(req, res) {
 
 export async function updateContactController(req, res) {
 
-    const contact = await updateContact(req.params.id, req.body);
+    const contact = await updateContact(req.params.id, req.body, req.user.id);
 
     if (contact === null) {
       throw new createHttpError.NotFound('Contact not found');

@@ -1,20 +1,21 @@
 import createHttpError from 'http-errors';
-import { SessionCollection } from '../db/session';
+import { SessionCollection } from '../db/session.js';
+import { UserCollection } from '../db/user.js';
 
-export function auth(req, res, next) {
-    const { autherization } = req.headers;
+export async function auth(req, res, next) {
+    const { authorization } = req.headers;
     
-    if (typeof autherization !== 'string') {
+    if (typeof authorization !== 'string') {
         throw new createHttpError.Unauthorized('Please provie access token');
     };
 
-    const [bearer, accessToken] = autherization.split(' ', 2);
+    const [bearer, accessToken] = authorization.split(' ', 2);
 
     if (bearer !== 'Bearer' || typeof accessToken !== 'string') {
         throw new createHttpError.Unauthorized('Please provide access token');
     };
 
-    const session = SessionCollection.findOne({ accessToken });
+    const session = await SessionCollection.findOne({ accessToken });
     
     if (session === null) {
         throw new createHttpError.Unauthorized('Session not found');
@@ -24,13 +25,13 @@ export function auth(req, res, next) {
         throw new createHttpError.Unauthorized('Access token expired');
     };
 
-    const user = session.userId;
+    const user = await UserCollection.findById(session.userId);
     
     if (user === null) {
         throw new createHttpError.Unauthorized('User not found');
     };
 
-    req.user = {id: user._id, email: user.email};
+    req.user = { id: user._id, email: user.email };
 
     next();
 };
