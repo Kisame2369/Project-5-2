@@ -123,7 +123,7 @@ export async function sendResetPasswordEmail(email) {
 export async function resetPassword(token, password) {
 
     try {
-        const decoded = jwt.verify(token, getEnvVariable('SECRET_JWT'));
+        const decoded = jwt.verify(token, getEnvVariable('JWT_SECRET'));
 
         const user = await UserCollection.findById(decoded.sub);
 
