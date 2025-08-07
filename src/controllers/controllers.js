@@ -94,7 +94,7 @@ export async function updateContactController(req, res) {
     photo = `http://localhost:3000/avatars/${req.file.filename}`;
   }
 
-    const contact = await updateContact(req.params.id, req.body, photo, req.user.id);
+  const contact = await updateContact(req.params.id, { ...req.body, photo, userId: req.user.id });
 
     if (contact === null) {
       throw new createHttpError.NotFound('Contact not found');
