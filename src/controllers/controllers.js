@@ -3,6 +3,10 @@ import createHttpError from 'http-errors';
 import { getAllContacts, getContactById, createContact, deleteContact, updateContact} from '../service/contacts.js';
 import { parsePagintionsParams } from '../utils/parsePagintionsParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
+import { getEnvVariable } from '../utils/getEnvVariable.js';
+import * as fs from 'node:fs/promises';
+import path from 'node:path';
+import { uploadToCloud } from '../utils/uploadToCloud.js';
 
 
 export async function getAllContactsController(req, res) {
@@ -39,7 +43,22 @@ export async function getContactByIdController(req, res) {
 
 export async function createContactController(req, res) {
 
-  const contact = await createContact({ ...req.body, userId: req.user.id });
+  let avatar = null;
+
+  if (getEnvVariable('UPLOAD_TO_CLOUDINARY') === 'true') {
+    const result = await uploadToCloud(req.file.path);
+    await fs.unlink(req.file.path);
+    avatar = result.secure_url;
+  } else {
+    await fs.rename(
+      req.file.path,
+      path.resolve('src/uploads/avatars', req.file.filename),
+    );
+    avatar = `http://localhost:9090/avatars/${req.file.filename}`;
+  }
+
+
+  const contact = await createContact({ ...req.body, avatar, userId: req.user.id });
 
     res.status(201).json({
       status: 201,
