@@ -6,6 +6,12 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { getEnvVariable } from "../utils/getEnvVariable.js";
 import { sendMail } from "../utils/sendMail.js";
+import Handlebars from "handlebars";
+import * as fs from 'node:fs';
+import path from 'node:path';
+
+const resetPasswordTemplatePath = fs.readFileSync(path.resolve('src/templates/reset-password-mail.hbs'), 'utf-8');
+const resetPasswordTemplate = Handlebars.compile(resetPasswordTemplatePath);
 
 const ACCESS_TOKEN_LIFETIME = 10 * 60 * 1000;
 const REFRESH_TOKEN_LIFETIME = 24 * 60 * 60 * 1000; 
@@ -114,7 +120,10 @@ export async function sendResetPasswordEmail(email) {
     await sendMail({
         to: email,
         subject: 'Reset Password',
-        html: `<p>Click <a href="http://localhost:3000/auth/reset-password?token=${token}">here</a> to reset your password.</p>`,
+        html: resetPasswordTemplate({
+            reserPasswordLink: `http://localhost:3000/auth/reset-password?token=${token}`,
+        }),
+
     });
 
 
@@ -123,7 +132,7 @@ export async function sendResetPasswordEmail(email) {
 export async function resetPassword(token, password) {
 
     try {
-        const decoded = jwt.verify(token, getEnvVariable('SECRET_JWT'));
+        const decoded = jwt.verify(token, getEnvVariable('JWT_SECRET'));
 
         const user = await UserCollection.findById(decoded.sub);
 

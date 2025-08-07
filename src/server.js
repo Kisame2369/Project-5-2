@@ -8,6 +8,7 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import authRoutes from './routes/auth.js';
 import cookieParser from 'cookie-parser';
 import { auth } from './middlewares/auth.js';
+import path from 'node:path';
 
 export default function setupServer() {
 
@@ -40,6 +41,7 @@ export default function setupServer() {
 
   app.use('/contacts', auth, contactRoutes);
   app.use('/auth', authRoutes);
+  app.use('/avatars', express.static(path.resolve('src/uploads/avatars')));
 
     app.use(notFoundHandler);
     app.use(errorHandler); 
