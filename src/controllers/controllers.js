@@ -43,22 +43,22 @@ export async function getContactByIdController(req, res) {
 
 export async function createContactController(req, res) {
 
-  let avatar = null;
+  let photo = null;
 
   if (getEnvVariable('UPLOAD_TO_CLOUDINARY') === 'true') {
     const result = await uploadToCloud(req.file.path);
     await fs.unlink(req.file.path);
-    avatar = result.secure_url;
+    photo = result.secure_url;
   } else {
     await fs.rename(
       req.file.path,
-      path.resolve('src/uploads/avatars', req.file.filename),
+      path.resolve('src/uploads/photos', req.file.filename),
     );
-    avatar = `http://localhost:9090/avatars/${req.file.filename}`;
+    photo = `http://localhost:3000/avatars/${req.file.filename}`;
   }
 
 
-  const contact = await createContact({ ...req.body, avatar, userId: req.user.id });
+  const contact = await createContact({ ...req.body, photo, userId: req.user.id });
 
     res.status(201).json({
       status: 201,
@@ -80,7 +80,21 @@ export async function deleteContactController(req, res) {
 
 export async function updateContactController(req, res) {
 
-    const contact = await updateContact(req.params.id, req.body, req.user.id);
+  let photo = null;
+
+  if (getEnvVariable('UPLOAD_TO_CLOUDINARY') === 'true') {
+    const result = await uploadToCloud(req.file.path);
+    await fs.unlink(req.file.path);
+    photo = result.secure_url;
+  } else {
+    await fs.rename(
+      req.file.path,
+      path.resolve('src/uploads/photos', req.file.filename),
+    );
+    photo = `http://localhost:3000/avatars/${req.file.filename}`;
+  }
+
+    const contact = await updateContact(req.params.id, req.body, photo, req.user.id);
 
     if (contact === null) {
       throw new createHttpError.NotFound('Contact not found');

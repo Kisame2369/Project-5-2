@@ -108,12 +108,13 @@ export async function sendResetPasswordEmail(email) {
 
     const token = jwt.sign({
         sub: user._id,
+        email: user.email,
         name: user.name,
     },
         getEnvVariable("JWT_SECRET"),
         
     {
-        expiresIn: '15m',
+        expiresIn: '5m',
     }
     );
 
