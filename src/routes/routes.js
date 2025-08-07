@@ -10,8 +10,8 @@ const router = express.Router();
 
 router.get('/', ctrlWrapper(getAllContactsController));
 router.get('/:id', isValidID, ctrlWrapper(getContactByIdController));
-router.post('/', upload.single('avatar'), validateBody(contactSchema), ctrlWrapper(createContactController));
+router.post('/', upload.single('photo'), validateBody(contactSchema), ctrlWrapper(createContactController));
 router.delete('/:id', isValidID, ctrlWrapper(deleteContactController));
-router.patch('/:id', isValidID, validateBody(contactUpdateSchema), ctrlWrapper(updateContactController));
+router.patch('/:id', upload.single('photo'), isValidID, validateBody(contactUpdateSchema), ctrlWrapper(updateContactController));
 
 export default router;

@@ -41,7 +41,7 @@ export default function setupServer() {
 
   app.use('/contacts', auth, contactRoutes);
   app.use('/auth', authRoutes);
-  app.use('/avatars', express.static(path.resolve('src/uploads/avatars')));
+  app.use('/photos', express.static(path.resolve('src/uploads/photos')));
 
     app.use(notFoundHandler);
     app.use(errorHandler); 
