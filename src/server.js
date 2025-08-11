@@ -9,6 +9,7 @@ import authRoutes from './routes/auth.js';
 import cookieParser from 'cookie-parser';
 import { auth } from './middlewares/auth.js';
 import path from 'node:path';
+import { swaggerDocs } from './middlewares/swaggerDocs.js';
 
 export default function setupServer() {
 
@@ -42,6 +43,7 @@ export default function setupServer() {
   app.use('/contacts', auth, contactRoutes);
   app.use('/auth', authRoutes);
   app.use('/photos', express.static(path.resolve('src/uploads/photos')));
+  app.use('/api-docs', swaggerDocs());
 
     app.use(notFoundHandler);
     app.use(errorHandler); 
