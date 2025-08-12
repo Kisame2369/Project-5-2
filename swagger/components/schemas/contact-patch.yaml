@@ -1,0 +1,30 @@
+type: object
+properties:
+  name:
+    description: "Contact's name. Empty not allowed."
+    type: string
+    example: John Doe
+  phoneNumber:
+    description: "Contact's phone number. Empty not allowed."
+    type: string
+    example: '+1234567890'
+  email:
+    description: "Contact's email"
+    type: string
+    format: email
+    example: john@example.com
+  isFavourite:
+    description: 'Contact is marked as favorite. Must be true or false. Empty not allowed.'
+    type: boolean
+    enum: [true, false]
+    default: false
+  contactType:
+    description: 'Type of contact.  Must be: work, home, personal. Empty not allowed.'
+    type: string
+    enum: ['work', 'home', 'personal']
+    example: work
+    default: 'personal'
+  photo:
+    description: "Contact's photo"
+    type: string
+    format: binary
