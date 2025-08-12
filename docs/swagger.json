@@ -12,6 +12,9 @@
   "servers": [
     {
       "url": "http://127.0.0.1:3000"
+    },
+    {
+      "url": "https://project-5-2-tmsp.onrender.com"
     }
   ],
   "tags": [
@@ -260,7 +263,7 @@
         "tags": [
           "Contacts"
         ],
-        "summary": "Get update contact by id",
+        "summary": "Get update contact by ID",
         "operationId": "patchContact",
         "description": "Retrieve a contact by its ID",
         "security": [
@@ -336,7 +339,7 @@
         "tags": [
           "Contacts"
         ],
-        "summary": "Delete contact by id",
+        "summary": "Delete contact by ID",
         "operationId": "deleteContact",
         "description": "Delete a contact by its ID",
         "security": [
