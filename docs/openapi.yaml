@@ -12,6 +12,7 @@ tags:
 
 servers:
   - url: http://127.0.0.1:3000
+  - url: https://project-5-2-tmsp.onrender.com
 
 paths:
   /contacts:
